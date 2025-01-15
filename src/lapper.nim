@@ -154,8 +154,16 @@ proc find*[T:Interval](L:var Lapper[T], start:int, stop:int, ivs:var seq[T]): bo
     ivs.setLen(n)
   return len(ivs) > 0
 
+proc detect*[T:Interval](L: var Lapper[T], start:int, stop:int): bool =
+  let off = lowerBound(L.intervals, start - L.max_len)
+  for i in off..L.intervals.high:
+    let x = L.intervals[i]
+    if x.overlap(start, stop):
+      return true
+  return false
+
 proc count*[T:Interval](L:var Lapper[T], start:int, stop:int): int =
-  ## fill ivs with all intervals in L that overlap start .. stop.
+  ## count intervals in L that overlap start .. stop.
   let off = lowerBound(L.intervals, start - L.max_len)
   for i in off..L.intervals.high:
     let x = L.intervals[i]
