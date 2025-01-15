@@ -91,6 +91,8 @@ template overlap*[T:Interval](a: T, start:int, stop:int): bool =
   #return a.start < stop and a.stop > start
   a.stop > start and a.start < stop
 
+template overlap*[T:Interval](a: T, b: T): bool =
+  a.stop > b.start and a.start < b.stop
 
 proc iv_cmp[T:Interval](a, b: T): int =
     if a.start < b.start: return -1
@@ -154,11 +156,22 @@ proc find*[T:Interval](L:var Lapper[T], start:int, stop:int, ivs:var seq[T]): bo
     ivs.setLen(n)
   return len(ivs) > 0
 
-proc detect*[T:Interval](L: var Lapper[T], start:int, stop:int): bool =
+proc dodo*[T:Interval](L:var Lapper[T]): Interval =
+  return L.intervals[0]
+
+proc detect*[T:Interval](L:var Lapper[T], start, stop:int): bool =
   let off = lowerBound(L.intervals, start - L.max_len)
   for i in off..L.intervals.high:
     let x = L.intervals[i]
     if x.overlap(start, stop):
+      return true
+  return false
+
+proc detect*[T:Interval](L:var Lapper[T], iv: T): bool =
+  let off = lowerBound(L.intervals, iv.start - L.max_len)
+  for i in off..L.intervals.high:
+    let x = L.intervals[i]
+    if x.overlap(iv):
       return true
   return false
 
